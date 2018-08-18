@@ -1,3 +1,4 @@
+
 #!/bin/bash
 ## Logging functions
 INFO(){ echo -e '\033[0;32m'"INFO:\033[0m $*"; }
@@ -108,6 +109,6 @@ case $1 in
 		exit 0
 		;;
 	*)
-		$PREFIXCOMMAND $WINE "X:/osu!.exe" &> /tmp/osu-wine.log &
+		$PREFIXCOMMAND $WINE "X:/osu!.exe" | tee /tmp/osu-wine.log
 		;;
 esac
