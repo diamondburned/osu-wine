@@ -7,125 +7,107 @@ ERRO(){ echo -e '\033[0;31m'"ERRO:\033[0m $*"; exit 1; }
 ## Define useful functions
 rm_w(){ [ -f "$1" ] && rm "$1"; }
 
-## Some vars
-export PREFIXCOMMAND TMP BASE_DIR
-export WINEPREFIX WINEARCH
-export WINE_REQ_MOD=( dotnet45 gdiplus )
-export OSU_INSTALL_PATH
-
 TMP="$(mktemp -u)"
 
 WINEARCH=win32
 BASE_DIR="$HOME/.local/share/osu-wine"
 WINEPREFIX="$BASE_DIR/WINE.$WINEARCH/"
 OSU_INSTALL_PATH="$BASE_DIR/OSU/"
+WINE_REQ_MOD=( dotnet45 )
+
 WINE="wine"
 marcRPC="false"
 
 # Sourcing after defining the config 
 CONF=( '/etc/osu-wine.conf' "$HOME/.osu-wine.conf" )
 for each in "${CONF[@]}"; do
-    source "$each" &> /dev/null || WARN "Missing: ${CONF}!";
+	source "$each" &> /dev/null || WARN "Missing: ${CONF}!";
 done
 
 ## Check some deps, the right way
 bin_exist(){
-    for bin in "$@"; do 
-        which "$1" &> /dev/null || ERRO "Missing ${1}!"; 
-    done
+	for bin in "$@"; do 
+		which "$1" &> /dev/null || ERRO "Missing ${1}!"; 
+	done
 }
 bin_exist wine winetricks wineserver winepath wineboot wget
 
-{
-    INFO "Check: Base dir $BASE_DIR"
-    mkdir -p "$BASE_DIR"                    
-}
+INFO "Check: Base dir $BASE_DIR"
+mkdir -p "$BASE_DIR"					
 
-{
-    INFO "Check: wineprefix exist $WINEPREFIX"
-    if [ ! -d "$WINEPREFIX" ]; then
-        INFO "Wine prefix not exist"
-        INFO "So try recreate it"
-        wineboot &> /dev/null || ERRO "Failed to initialize wine(boot)!"
-        INFO "Created: $WINEPREFIX"
-    fi
-    INFO "Last tested version: wine-2.16"
-    INFO "Your version: $(wine --version)"
-}
+INFO "Check: wineprefix exist $WINEPREFIX"
+if [ ! -d "$WINEPREFIX" ]; then
+	INFO "Wine prefix not exist"
+	INFO "So try recreate it"
+	wineboot &> /dev/null || ERRO "Failed to initialize wine(boot)!"
+	INFO "Created: $WINEPREFIX"
+fi
+INFO "Last tested version: wine-2.16"
+INFO "Your version: $(wine --version)"
 
-{
-    INFO "Check: wineprefix configured"
-    cd "$WINEPREFIX" || exit 1
-    if [ ! -f "winetricks.log" ]; then
-        winetricks -q --optout "${WINE_REQ_MOD[@]}" || ERRO "Something went wrong at Winetricks!"
-    fi
-}
+INFO "Check: wineprefix configured"
+cd "$WINEPREFIX" || exit 1
+if [ ! -f "winetricks.log" ]; then
+	winetricks -q --optout "${WINE_REQ_MOD[@]}" || ERRO "Something went wrong at Winetricks!"
+fi
 
-{
-    INFO "Check: wine can access only to wine drive C:/ + X:/ (osu)"
-    for link in "$WINEPREFIX/dosdevices"/*; do
-        [[ "$link" =~ c: ]] && continue # For default link to ../drive_c
-        [[ "$link" =~ x: ]] && continue # For link to osu path
-        rm -v "$link"
-    done
-}
+INFO "Check: wine can access only to wine drive C:/ + X:/ (osu)"
+for link in "$WINEPREFIX/dosdevices"/*; do
+	[[ "$link" =~ c: ]] && continue # For default link to ../drive_c
+	[[ "$link" =~ x: ]] && continue # For link to osu path
+	rm -v "$link"
+done
 
-{
-    INFO "Check: osu dir"
-    mkdir -p "$OSU_INSTALL_PATH"
-}
+INFO "Check: osu dir"
+mkdir -p "$OSU_INSTALL_PATH"
 
-{
-    INFO "Check: Link X: -> $OSU_INSTALL_PATH"
-    ln -Tfs "$OSU_INSTALL_PATH" "$WINEPREFIX/dosdevices/x:"
-}
+INFO "Check: Link X: -> $OSU_INSTALL_PATH"
+ln -Tfs "$OSU_INSTALL_PATH" "$WINEPREFIX/dosdevices/x:"
 
 cd "$OSU_INSTALL_PATH" || exit 1
 
-{
-    if [ ! -f "osu!.exe" ]; then
-        INFO "Can't find osu exe, reinstall"
-        wget "http://m1.ppy.sh/r/osu!install.exe" -O "osu!.exe"
-        [ ! -f "discord-rpc.dll" ] && wget "https://github.com/diamondburned/osu-wine/raw/master/static/discord-rpc.dll" -O "discord-rpc.dll"
-    fi
-}
+if [ ! -f "osu!.exe" ]; then
+	INFO "Can't find osu exe, reinstall"
+	wget "http://m1.ppy.sh/r/osu!install.exe" -O "osu!.exe"
+	[ ! -f "discord-rpc.dll" ] && wget "https://github.com/diamondburned/osu-wine/raw/master/static/discord-rpc.dll" -O "discord-rpc.dll"
+fi
 
 if [[ "${marcRPC}" = true ]]; then 
-    DEST="$BASE_DIR/rpc-dll/"
-    if [[ ! -e "$DEST/bin32" || ! -e "$DEST/bin64" ]]; then
-        mkdir -p "$DEST"
-        bin_exist wget tar
-        [ -z $ver ] && ver="1.0.0"
-        wget -O "/tmp/rpc-wine.tar.gz" "https://github.com/Marc3842h/rpc-wine/releases/download/${ver}/rpc-wine.tar.gz" || ERRO "Failed to fetch marc-rpc"
-        tar -xvzf "/tmp/rpc-wine.tar.gz" -C "$DEST" &> /dev/null || ERRO "tar failed to extract."
-    fi
+	DEST="$BASE_DIR/rpc-dll/"
+	if [[ ! -e "$DEST/bin32" || ! -e "$DEST/bin64" ]]; then
+		mkdir -p "$DEST"
+		bin_exist wget tar
+		[ -z $ver ] && ver="1.0.0"
+		wget -O "/tmp/rpc-wine.tar.gz" "https://github.com/Marc3842h/rpc-wine/releases/download/${ver}/rpc-wine.tar.gz" || ERRO "Failed to fetch marc-rpc"
+		tar -xvzf "/tmp/rpc-wine.tar.gz" -C "$DEST" &> /dev/null || ERRO "tar failed to extract."
+	fi
 
-    export WINEDLLPATH="$DEST/bin32:$DEST/bin64:$WINEDLLPATH"
+	export WINEDLLPATH="$DEST/bin32:$DEST/bin64:$WINEDLLPATH"
 fi
 
 INFO "Initialization Finished"
 
 case $1 in 
-    *'.osz'|*'.osz2'|*'.osr'|*'.osk')
-        mv -f "$1" ./
-        for file in ./*.osz ./*.osz2 ./*.osr ./*.osk; do
-            [ ! -f "$file" ] && continue
-            $PREFIXCOMMAND $WINE "X:/osu!.exe" "$file"
-        done
-        exit 0
-        ;;
-    'osu://'*)
-        $PREFIXCOMMAND $WINE "X:/osu!.exe" "$1"
-        ;;
-    '--winetricks')
-        $PREFIXCOMMAND winetricks ${@:2} || ERRO "Winetricks errored out."
-        exit 0
-        ;;
-    '--winecfg')
-        $PREFIXCOMMAND $WINE winecfg || ERRO "Winecfg errored out."
-        exit 0
-        ;;
-    *)
-        $PREFIXCOMMAND $WINE "X:/osu!.exe" &> /tmp/osu-wine.log &
-        ;;
+	*'.osz'|*'.osz2'|*'.osr'|*'.osk')
+		mv -f "$1" ./
+		for file in ./*.osz ./*.osz2 ./*.osr ./*.osk; do
+			[ ! -f "$file" ] && continue
+			$PREFIXCOMMAND $WINE "X:/osu!.exe" "$file"
+		done
+		exit 0
+		;;
+	'osu://'*)
+		$PREFIXCOMMAND $WINE "X:/osu!.exe" "$1"
+		;;
+	'--winetricks')
+		$PREFIXCOMMAND winetricks ${@:2} || ERRO "Winetricks errored out."
+		exit 0
+		;;
+	'--winecfg')
+		$PREFIXCOMMAND $WINE winecfg || ERRO "Winecfg errored out."
+		exit 0
+		;;
+	*)
+		$PREFIXCOMMAND $WINE "X:/osu!.exe" &> /tmp/osu-wine.log &
+		;;
 esac
