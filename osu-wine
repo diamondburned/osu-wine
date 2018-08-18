@@ -7,13 +7,13 @@ ERRO(){ echo -e '\033[0;31m'"ERRO:\033[0m $*"; exit 1; }
 ## Define useful functions
 rm_w(){ [ -f "$1" ] && rm "$1"; }
 
-TMP="$(mktemp -u)"
-
-WINEARCH=win32
-BASE_DIR="$HOME/.local/share/osu-wine"
-WINEPREFIX="$BASE_DIR/WINE.$WINEARCH/"
-OSU_INSTALL_PATH="$BASE_DIR/OSU/"
-WINE_REQ_MOD=( dotnet45 )
+export TMP="$(mktemp -u)"
+export PREFIXCOMMAND=""
+export WINEARCH=win32
+export BASE_DIR="$HOME/.local/share/osu-wine"
+export WINEPREFIX="$BASE_DIR/WINE.$WINEARCH/"
+export OSU_INSTALL_PATH="$BASE_DIR/OSU/"
+export WINE_REQ_MOD=( dotnet45 )
 
 WINE="wine"
 marcRPC="false"
