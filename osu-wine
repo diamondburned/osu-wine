@@ -126,6 +126,11 @@ case $1 in
 		[[ $CHOICE = 'y' || $CHOICE = 'Y' ]] && rm -rf "$OSU_INSTALL_PATH" || INFO "Removed osu"
 		exit 0
 		;;
+	'--kill')
+		pkill -f '^.exe' || INFO 'Killed all processes ending with .exe'
+		pkill -f 'wineserver' || INFO 'Killed wineserver'
+		exit 0
+		;;
 	'--help'|'-h')
 		sub()  { echo $'\t'"$@"; }
 		sub2() { echo $'\t\t'"$@"$'\n'; }
