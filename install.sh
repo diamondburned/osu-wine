@@ -67,7 +67,6 @@ function uninstall() {
 	fi
 
 	INFO "Uninstallation completed."
-	exit 0
 }
 
 function help() {
@@ -83,6 +82,7 @@ function help() {
 
 case "$1" in
 	'uninstall')	uninstall
+					exit 0
 		;;
 	'help')			help
 		;;
