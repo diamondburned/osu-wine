@@ -1,4 +1,3 @@
-
 #!/bin/bash
 ## Logging functions
 INFO(){ echo -e '\033[0;32m'"INFO:\033[0m $*"; }
@@ -15,9 +14,9 @@ export BASE_DIR="$HOME/.local/share/osu-wine"
 export WINEPREFIX="$BASE_DIR/WINE.$WINEARCH/"
 export OSU_INSTALL_PATH="$BASE_DIR/OSU/"
 export WINE_REQ_MOD=( dotnet45 )
-
-WINE="wine"
-marcRPC="false"
+export WINE="wine"
+export marcRPC="false"
+export install_wine_osu="false"
 
 # Sourcing after defining the config 
 CONF=( '/etc/osu-wine.conf' "$HOME/.osu-wine.conf" )
@@ -84,6 +83,18 @@ if [[ "${marcRPC}" = true ]]; then
 
 	export WINEDLLPATH="$DEST/bin32:$DEST/bin64:$WINEDLLPATH"
 fi
+
+#if [[ "$install_wine_osu" = true ]]; then
+#	[ -z $wine_osu_ver ] && wine_osu_ver="3.13-1-x86_64"
+#
+#	DEST="$BASE_DIR/wine-osu"
+#	if [[ ! -e "$DEST" ]]; then
+#		wget "https://archrepo.thepoon.fr/wine-osu-${wine_osu_ver}.pkg.tar.xz" -O "/tmp/wine-osu-${wine_osu_ver}.pkg.tar.xz" || ERRO "Failed to fetch wine-osu"
+#		mkdir -p /tmp/wine-osu
+#		tar -xvf "/tmp/wine-osu-${wine_osu_ver}.pkg.tar.xz" -C /tmp/wine-osu || ERRO "tar failed to extract."
+#		mv -f /tmp/wine-osu/opt/wine-osu "$DEST" && INFO "Poon's Wine installed into $DEST" 
+#	fi
+#fi
 
 INFO "Initialization Finished"
 

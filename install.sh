@@ -23,8 +23,8 @@ function install() {
 	which awk &> /dev/null || ERRO "Missing awk!";
 	dimensions_arr=( $(ls ./icons | awk -F '-' '{print $3}' | awk -F '.' '{print $1}') )
 	for dimensions in "${dimensions_arr[@]}"; do
-		cp "./icons/osu-wine-${dimensions}.png" "/usr/share/icons/hicolor/${dimensions}/apps/osu-wine.png" || ERRO "Failed to install icons";
-		chmod 644 "/usr/share/icons/hicolor/${dimensions}/apps/osu-wine.png" || ERRO "chmod icons failed";
+		cp "./icons/osu-wine-${dimensions}.png" "/usr/share/icons/hicolor/${dimensions}/apps/osu-wine.png" || WARN "Couldn't install $dimensions";
+		chmod 644 "/usr/share/icons/hicolor/${dimensions}/apps/osu-wine.png" || WARN "chmod icons failed";
 	done
 	
 	INFO "Installing desktop files..."
@@ -85,6 +85,9 @@ case "$1" in
 	'uninstall')	uninstall
 		;;
 	'help')			help
+		;;
+	'update')		uninstall
+					install
 		;;
 	'')				install
 		;;
