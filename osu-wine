@@ -120,7 +120,7 @@ case $1 in
 		;;
 	'--remove')
 		pkill -f '^.exe'
-		pkill -f 'wine'
+		pkill -f 'wineserver'
 		rm -rf "$WINEPREFIX" || INFO "Removed Wineprefix"
 		read -p "Do you want to delete osu? All data will be lost. (y/N)" CHOICE
 		[[ $CHOICE = 'y' || $CHOICE = 'Y' ]] && rm -rf "$OSU_INSTALL_PATH" || INFO "Removed osu"
