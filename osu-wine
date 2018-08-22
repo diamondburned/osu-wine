@@ -141,8 +141,10 @@ case $1 in
 			sub2 "- Runs Winetricks on the osu!Linux Wineprefix"
 		sub "osu-wine --winecfg"
 			sub2 "- Runs winecfg on the osu!Linux Wineprefix"
+		sub "osu-wine --kill"
+			sub2 "- Kills all Wine and Windows processes (dangerous)"
 		sub "osu-wine --remove"
-			sub2 "- Uninstalls the Wineprefix and optionally the game too"
+			sub2 "- Uninstalls the Wineprefix and optionally the game too (dangerous)"
 		exit 0
 		;;
 	*)
