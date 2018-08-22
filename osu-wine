@@ -118,6 +118,14 @@ case $1 in
 		$PREFIXCOMMAND $WINE winecfg || ERRO "Winecfg errored out."
 		exit 0
 		;;
+	'--remove')
+		pkill -f '^.exe'
+		pkill -f 'wine'
+		rm -rf "$WINEPREFIX" || INFO "Removed Wineprefix"
+		read -p "Do you want to delete osu? All data will be lost. (y/N)" CHOICE
+		[[ $CHOICE = 'y' || $CHOICE = 'Y' ]] && rm -rf "$OSU_INSTALL_PATH" || INFO "Removed osu"
+		exit 0
+		;;
 	*)
 		$PREFIXCOMMAND $WINE "X:/osu!.exe" | tee /tmp/osu-wine.log
 		;;
