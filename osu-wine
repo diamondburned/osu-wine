@@ -122,8 +122,22 @@ case $1 in
 		pkill -f '^.exe'
 		pkill -f 'wineserver'
 		rm -rf "$WINEPREFIX" || INFO "Removed Wineprefix"
-		read -p "$(WARN "Do you want to delete osu? All data will be lost. (y/N) ")" CHOICE
+		read -p "$(WARN 'Do you want to delete osu? All data will be lost. (y/N) ')" CHOICE
 		[[ $CHOICE = 'y' || $CHOICE = 'Y' ]] && rm -rf "$OSU_INSTALL_PATH" || INFO "Removed osu"
+		exit 0
+		;;
+	'--help'|'-h')
+		sub()  { echo $'\t'"$@"; }
+		sub2() { echo $'\t\t'"$@"$'\n'; }
+		echo "_Usages"
+		sub "osu-wine"
+			sub2 "- Automatic installation of the game and run it"
+		sub "osu-wine --winetricks [winetricks packages]"
+			sub2 "- Runs Winetricks on the osu!Linux Wineprefix"
+		sub "osu-wine --winecfg"
+			sub2 "- Runs winecfg on the osu!Linux Wineprefix"
+		sub "osu-wine --remove"
+			sub2 "- Uninstalls the Wineprefix and optionally the game too"
 		exit 0
 		;;
 	*)
