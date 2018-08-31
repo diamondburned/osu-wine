@@ -1,6 +1,8 @@
 # osu-wine
 osu! install/run wrapper, forked by diamondburned.
 
+### Deprecated in favor of https://gitlab.com/osu-wine/osu-wine/
+
 ## Instructions
 
 Run `./install.sh` **as root/sudo**
